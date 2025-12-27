@@ -1,32 +1,34 @@
 import React, { useState } from 'react'
 import { FaCheck, FaDeleteLeft, FaPlus, FaXmark } from 'react-icons/fa6'
 import { useDispatch, useSelector } from 'react-redux';
-import { handleAddItem, handleBought, handleClearList, handleDeleteItem } from './handleFunction';
-import { clearList, deleteItems, setBoughtTrue, addItem } from "./listSlice";
+import { deleteItems, setBoughtTrue } from "./listSlice";
+import InputForm from './InputForm';
+import { setInputState } from './inputSlice';
+import ConfirmPopup from './ConfirmPopup';
+import { setConfirm } from './confirmSlice'
+
 
 function App() {
   const itemList = useSelector((state) => state.list);
   const dispatch = useDispatch();
 
-  const handleDeleteItem = (selectedId) => {
+  const handleDeleteItem = () => {
       dispatch(deleteItems(selectedId))
   };
-  
-  const handleAddItem = (item) => {
-  };
-  const handleClearList = () => {
-      dispatch(clearList())
-  };
-  const handleBought = (selectedId) => {
-      dispatch(setBoughtTrue(selectedId))
+  const handleBought = () => {
+      dispatch(setBoughtTrue(selectedId));
+      setSelectedId([])
   };
 
-  const [selectedId, setSelectedId] = useState([])
-  console.log(selectedId)
-  console.log(itemList)
+  const inputState = useSelector((state) => state.inputToggle.toggled);
+  const confirmState = useSelector((state) => state.confirm.opened);
+  const [selectedId, setSelectedId] = useState([]);
+
 
   return (
-    <div>
+    <div className=''>
+      {inputState && <InputForm />}
+      {confirmState && <ConfirmPopup />}
       <div className='max-w-4xl mx-auto'>
         <div className='mt-20'>
           <h1 className='text-4xl text-center font-serif mb-2'>Items List</h1>
@@ -58,11 +60,12 @@ function App() {
                 <input type="checkbox" name="" id="" 
                 checked={selectedId.includes(item.id)}
                 onChange={() => {
-                  if (!selectedId.includes(item.id)) {
+                  if (selectedId.includes(item.id)) {
+                    setSelectedId(selectedId.filter(id => id !== item.id))
+                  }else {
                     setSelectedId([...selectedId, item.id])
                   }
                 }}
-                
                 />
                 <span className='px-2'>{item.title}</span>
                 <span className='px-2'>{item.quantity}</span>
@@ -72,14 +75,14 @@ function App() {
           </div>
         </div>
         <div className='flex justify-around pb-10'>
-          <button className='py-2 px-4 text-xl border border-dark rounded-md'
-          onClick={() => handleAddItem()}
+          <button className='py-2 px-4 text-xl border border-dark rounded-md hover:cursor-pointer'
+          onClick={() => dispatch(setInputState(true))}
           >
             <FaPlus className='inline-block mr-2'/>
             Add Item
           </button>
-          <button className='py-2 px-4 text-xl bg-red-700 rounded-md text-white'
-          onClick={() => handleClearList()}>
+          <button className='py-2 px-4 text-xl bg-red-700 rounded-md text-white hover:cursor-pointer'
+          onClick={() => dispatch(setConfirm(true))}>
             <FaXmark className='inline-block mr-2'/>
             Clear List
           </button>

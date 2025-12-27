@@ -1,9 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import listReducer from "./listSlice";
+import inputToggleReducer from "./inputSlice";
+import confirmReducer from './confirmSlice'
 
 const store = configureStore({
   reducer: {
-    list: listReducer
+    list: listReducer,
+    inputToggle: inputToggleReducer,
+    confirm: confirmReducer
   }
 })
 
